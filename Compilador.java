@@ -1,3 +1,8 @@
+//Lucas Barbosa 2207306
+//Beatriz Zuim 22204926
+//João Berg 2107012
+//Thomaz Ortiz 2201143
+
 import javax.swing.*;     // Componentes da interface gráfica (Swing)
 import java.awt.*;        // Gerenciadores de layout e componentes de alto nível
 import java.io.*;         // Leitura e gravação de arquivos (.POR e .TEM)
@@ -5,11 +10,13 @@ import java.util.*;       // Estruturas como HashMap, Scanner, List, Map
 import java.util.regex.*; // Expressões regulares usadas para identificar tokens
 
 
-public class Compilador extends JFrame {
+public class Compilador extends JFrame { // Classe principal do compilador
 
-    JTextArea outputArea = new JTextArea(20, 50);
+    JTextArea outputArea = new JTextArea(20, 50); // Área de texto para exibir os resultados
 
-    public Compilador() {
+    public Compilador() {// Construtor da classe Compilador
+        
+        // Configuração da janela
         super("Analisador Lexico");
 
         JButton abrirBtn = new JButton("Abrir arquivo");
@@ -26,11 +33,10 @@ public class Compilador extends JFrame {
         this.pack();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
-       
-
     }
 
-    private void escolherArquivo() {
+    
+    private void escolherArquivo() { // Método para abrir o seletor de arquivos
         JFileChooser fileChooser = new JFileChooser();
         int resultado = fileChooser.showOpenDialog(this);
 
@@ -40,13 +46,13 @@ public class Compilador extends JFrame {
         }
     }
 
-    private void analisarArquivo(File arquivo) {
+    private void analisarArquivo(File arquivo) { // Método para analisar o arquivo selecionado
         try {
             Scanner scanner = new Scanner(arquivo);
             StringBuilder resultado = new StringBuilder();
             TabelaSimbolos tabela = new TabelaSimbolos();
 
-            // Criando mapa de palavras reservadas (compatível com Java 8+)
+            // Criando mapa de palavras reservadas 
             Map<String, String> palavrasReservadas = new HashMap<>();
             palavrasReservadas.put("se", "SE");
             palavrasReservadas.put("então", "ENTAO");
@@ -153,8 +159,8 @@ public class Compilador extends JFrame {
         }
     }
 
-    // Classe da tabela de símbolos (usando HashMap)
-    static class TabelaSimbolos {
+    
+    static class TabelaSimbolos {// Classe da tabela de símbolos (usando HashMap)
         private HashMap<String, Integer> tabela = new HashMap<>();
         private int contador = 0;
 
@@ -166,7 +172,7 @@ public class Compilador extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) { // Método principal para executar o compilador
         SwingUtilities.invokeLater(() -> new Compilador().setVisible(true));
     }
 }

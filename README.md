@@ -1,3 +1,9 @@
+## Integrantes
+Lucas Barbosa 2207306
+Beatriz Zuim 22204926
+João Berg 2107012
+Thomaz Ortiz 2201143
+
 # Compilador Simples (.POR → Tabela de Tokens)
 
 Este projeto é um analisador léxico simples para arquivos `.POR`. Ele lê o código-fonte, identifica os tokens e gera uma tabela de símbolos, exibindo o resultado na tela e salvando em `saida.TEM`.
@@ -73,4 +79,3 @@ EOF -1
 - O projeto pode ser expandido para análise sintática e semântica.
 
 ---
-Desenvolvido para fins didáticos.
