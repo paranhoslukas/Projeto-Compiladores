@@ -1,8 +1,8 @@
-## Integrantes
-Lucas Barbosa 2207306
-Beatriz Zuim 22204926
-João Berg 2107012
-Thomaz Ortiz 2201143
+# Integrantes
+- Lucas Barbosa 2207306
+- Beatriz Zuim 22204926
+- João Berg 2107012
+- Thomaz Ortiz 2201143
 
 # Compilador Simples (.POR → Tabela de Tokens)
 
