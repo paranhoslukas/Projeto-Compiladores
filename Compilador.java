@@ -44,7 +44,7 @@ public class Compilador extends JFrame {
 
     private void analisarArquivo(File arquivo) {
         try {
-            Scanner scanner = new Scanner(arquivo);
+           Scanner scanner = new Scanner(new InputStreamReader(new FileInputStream(arquivo), "UTF-8"));
             StringBuilder resultado = new StringBuilder();
             TabelaSimbolos tabela = new TabelaSimbolos();
             java.util.List<String> listaDeTokens = new ArrayList<>();
@@ -66,9 +66,11 @@ public class Compilador extends JFrame {
             palavrasReservadas.put("ou", "OU");
             palavrasReservadas.put("não", "NAO");
 
-            Pattern pattern = Pattern.compile(
-                "\"[^\"]*\"|[a-zA-Z_][a-zA-Z_0-9]*|[0-9]+|<=|>=|<>|<|>|=|<-|\\+|\\-|\\*|/|\\(|\\)|;"
-            );
+        Pattern pattern = Pattern.compile(
+    "\"[^\"]*\"|[\\p{L}_][\\p{L}_0-9]*|[0-9]+|<=|>=|<>|<|>|=|<-|\\+|\\-|\\*|/|\\(|\\)|;"
+);
+
+
 
             while (scanner.hasNextLine()) {
                 String linha = scanner.nextLine();
@@ -133,17 +135,15 @@ public class Compilador extends JFrame {
         System.out.println("[Análise Sintática]");
         for (int i = 0; i < tokens.size() - 2; i++) {
             if (tokens.get(i).equals("TIPO") &&
-                tokens.get(i + 1).equals("ID") &&
-                tokens.get(i + 2).equals("PONTOEVIRGULA")) {
-                System.out.println("✓ Declaração de variável válida.");
+                tokens.get(i + 1).equals("ID")) {
+                System.out.println("✓ Declaração de variável encontrada.");
             }
         }
 
         for (int i = 0; i < tokens.size() - 3; i++) {
             if (tokens.get(i).equals("ID") &&
                 tokens.get(i + 1).equals("ATR") &&
-                tokens.get(i + 2).equals("NUMINT") &&
-                tokens.get(i + 3).equals("PONTOEVIRGULA")) {
+                tokens.get(i + 2).equals("NUMINT")) {
                 System.out.println("✓ Atribuição válida.");
             }
         }
@@ -160,20 +160,19 @@ public class Compilador extends JFrame {
             "leia", "escreva", "inteiro", "e", "ou", "não"
         ));
 
-        for (int i = 0; i < tokens.size() - 2; i++) {
+        // Encontra IDs declarados (com ou sem ponto e vírgula)
+        for (int i = 0; i < tokens.size() - 1; i++) {
             if (tokens.get(i).equals("TIPO") &&
-                tokens.get(i + 1).equals("ID") &&
-                tokens.get(i + 2).equals("PONTOEVIRGULA")) {
+                tokens.get(i + 1).equals("ID")) {
                 declaradas.add(lexemas.get(i + 1));
             }
         }
 
+        // Verifica se IDs usados foram declarados
         for (int i = 0; i < tokens.size(); i++) {
             if (tokens.get(i).equals("ID")) {
                 String nome = lexemas.get(i);
-                if (palavrasReservadas.contains(nome)) {
-                    continue; // ignora palavras reservadas escritas como ID
-                }
+                if (palavrasReservadas.contains(nome)) continue;
                 if (!declaradas.contains(nome)) {
                     System.out.println("⚠ Erro semântico: identificador \"" + nome + "\" usado sem declaração.");
                 }
