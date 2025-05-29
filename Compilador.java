@@ -1,23 +1,20 @@
-//Lucas Barbosa 2207306
-//Beatriz Zuim 22204926
-//João Berg 2107012
-//Thomaz Ortiz 2201143
+// Lucas Barbosa 2207306
+// Beatriz Zuim 22204926
+// João Berg 2107012
+// Thomaz Ortiz 2201143
 
-import javax.swing.*;     // Componentes da interface gráfica (Swing)
-import java.awt.*;        // Gerenciadores de layout e componentes de alto nível
-import java.io.*;         // Leitura e gravação de arquivos (.POR e .TEM)
-import java.util.*;       // Estruturas como HashMap, Scanner, List, Map
-import java.util.regex.*; // Expressões regulares usadas para identificar tokens
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.util.*;
+import java.util.regex.*;
 
+public class Compilador extends JFrame {
 
-public class Compilador extends JFrame { // Classe principal do compilador
+    JTextArea outputArea = new JTextArea(20, 50);
 
-    JTextArea outputArea = new JTextArea(20, 50); // Área de texto para exibir os resultados
-
-    public Compilador() {// Construtor da classe Compilador
-        
-        // Configuração da janela
-        super("Analisador Lexico");
+    public Compilador() {
+        super("Analisador Léxico, Sintático e Semântico");
 
         JButton abrirBtn = new JButton("Abrir arquivo");
         abrirBtn.addActionListener(e -> escolherArquivo());
@@ -35,8 +32,7 @@ public class Compilador extends JFrame { // Classe principal do compilador
         this.setLocationRelativeTo(null);
     }
 
-    
-    private void escolherArquivo() { // Método para abrir o seletor de arquivos
+    private void escolherArquivo() {
         JFileChooser fileChooser = new JFileChooser();
         int resultado = fileChooser.showOpenDialog(this);
 
@@ -46,13 +42,14 @@ public class Compilador extends JFrame { // Classe principal do compilador
         }
     }
 
-    private void analisarArquivo(File arquivo) { // Método para analisar o arquivo selecionado
+    private void analisarArquivo(File arquivo) {
         try {
             Scanner scanner = new Scanner(arquivo);
             StringBuilder resultado = new StringBuilder();
             TabelaSimbolos tabela = new TabelaSimbolos();
+            java.util.List<String> listaDeTokens = new ArrayList<>();
+            java.util.List<String> lexemas = new ArrayList<>();
 
-            // Criando mapa de palavras reservadas 
             Map<String, String> palavrasReservadas = new HashMap<>();
             palavrasReservadas.put("se", "SE");
             palavrasReservadas.put("então", "ENTAO");
@@ -90,58 +87,29 @@ public class Compilador extends JFrame { // Classe principal do compilador
                     } else if (lexema.matches("\"[^\"]*\"")) {
                         tipo = "STRING";
                     } else {
-                        // switch tradicional
                         switch (lexema) {
-                            case "<-":
-                                tipo = "ATR";
-                                break;
-                            case "+":
-                                tipo = "OPMAIS";
-                                break;
-                            case "-":
-                                tipo = "OPMENOS";
-                                break;
-                            case "*":
-                                tipo = "OPMULTI";
-                                break;
-                            case "/":
-                                tipo = "OPDIVI";
-                                break;
-                            case "<":
-                                tipo = "LOGMENOR";
-                                break;
-                            case ">":
-                                tipo = "LOGMAIOR";
-                                break;
-                            case "<=":
-                                tipo = "LOGMENORIGUAL";
-                                break;
-                            case ">=":
-                                tipo = "LOGMAIORIGUAL";
-                                break;
-                            case "=":
-                                tipo = "LOGIGUAL";
-                                break;
-                            case "<>":
-                                tipo = "LOGDIFF";
-                                break;
-                            case "(":
-                                tipo = "PARAB";
-                                break;
-                            case ")":
-                                tipo = "PARFE";
-                                break;
-                            case ";":
-                                tipo = "PONTOEVIRGULA";
-                                break;
-                            default:
-                                tipo = "DESCONHECIDO";
-                                break;
+                            case "<-": tipo = "ATR"; break;
+                            case "+": tipo = "OPMAIS"; break;
+                            case "-": tipo = "OPMENOS"; break;
+                            case "*": tipo = "OPMULTI"; break;
+                            case "/": tipo = "OPDIVI"; break;
+                            case "<": tipo = "LOGMENOR"; break;
+                            case ">": tipo = "LOGMAIOR"; break;
+                            case "<=": tipo = "LOGMENORIGUAL"; break;
+                            case ">=": tipo = "LOGMAIORIGUAL"; break;
+                            case "=": tipo = "LOGIGUAL"; break;
+                            case "<>": tipo = "LOGDIFF"; break;
+                            case "(": tipo = "PARAB"; break;
+                            case ")": tipo = "PARFE"; break;
+                            case ";": tipo = "PONTOEVIRGULA"; break;
+                            default: tipo = "DESCONHECIDO"; break;
                         }
                     }
 
                     int pos = tipo.equals("ID") ? tabela.adicionar(lexema) : -1;
                     resultado.append(tipo).append(" ").append(pos).append("\n");
+                    listaDeTokens.add(tipo);
+                    lexemas.add(lexema);
                 }
             }
 
@@ -149,18 +117,73 @@ public class Compilador extends JFrame { // Classe principal do compilador
             outputArea.setText(resultado.toString());
             scanner.close();
 
-            // Salva em arquivo também
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("saida.TEM"))) {
                 writer.write(resultado.toString());
             }
+
+            analisarSintaticamente(listaDeTokens);
+            analisarSemantica(listaDeTokens, lexemas);
 
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Erro ao ler o arquivo.");
         }
     }
 
-    
-    static class TabelaSimbolos {// Classe da tabela de símbolos (usando HashMap)
+    private void analisarSintaticamente(java.util.List<String> tokens) {
+        System.out.println("[Análise Sintática]");
+        for (int i = 0; i < tokens.size() - 2; i++) {
+            if (tokens.get(i).equals("TIPO") &&
+                tokens.get(i + 1).equals("ID") &&
+                tokens.get(i + 2).equals("PONTOEVIRGULA")) {
+                System.out.println("✓ Declaração de variável válida.");
+            }
+        }
+
+        for (int i = 0; i < tokens.size() - 3; i++) {
+            if (tokens.get(i).equals("ID") &&
+                tokens.get(i + 1).equals("ATR") &&
+                tokens.get(i + 2).equals("NUMINT") &&
+                tokens.get(i + 3).equals("PONTOEVIRGULA")) {
+                System.out.println("✓ Atribuição válida.");
+            }
+        }
+
+        System.out.println("[Fim da Análise Sintática]");
+    }
+
+    private void analisarSemantica(java.util.List<String> tokens, java.util.List<String> lexemas) {
+        System.out.println("[Análise Semântica]");
+
+        Set<String> declaradas = new HashSet<>();
+        Set<String> palavrasReservadas = new HashSet<>(Arrays.asList(
+            "se", "então", "senão", "fim_se", "para", "passo", "até", "fim_para",
+            "leia", "escreva", "inteiro", "e", "ou", "não"
+        ));
+
+        for (int i = 0; i < tokens.size() - 2; i++) {
+            if (tokens.get(i).equals("TIPO") &&
+                tokens.get(i + 1).equals("ID") &&
+                tokens.get(i + 2).equals("PONTOEVIRGULA")) {
+                declaradas.add(lexemas.get(i + 1));
+            }
+        }
+
+        for (int i = 0; i < tokens.size(); i++) {
+            if (tokens.get(i).equals("ID")) {
+                String nome = lexemas.get(i);
+                if (palavrasReservadas.contains(nome)) {
+                    continue; // ignora palavras reservadas escritas como ID
+                }
+                if (!declaradas.contains(nome)) {
+                    System.out.println("⚠ Erro semântico: identificador \"" + nome + "\" usado sem declaração.");
+                }
+            }
+        }
+
+        System.out.println("[Fim da Análise Semântica]");
+    }
+
+    static class TabelaSimbolos {
         private HashMap<String, Integer> tabela = new HashMap<>();
         private int contador = 0;
 
@@ -172,7 +195,7 @@ public class Compilador extends JFrame { // Classe principal do compilador
         }
     }
 
-    public static void main(String[] args) { // Método principal para executar o compilador
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new Compilador().setVisible(true));
     }
 }
